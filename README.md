@@ -18,25 +18,8 @@ Um sistema completo para gerenciamento de máquinas virtuais VirtualBox com inte
 - ✅ Documentação da API
 
 ### Frontend (React.js)
-- ✅ Interface moderna com Material-UI
-- ✅ Dashboard com estatísticas em tempo real
-- ✅ Gerenciamento visual de VMs
-- ✅ Sistema de navegação responsivo
-- ✅ Notificações em tempo real
-- ✅ Busca e filtros avançados
-
-## 📁 Estrutura do Projeto
-
-```
-virtualbox-manager/
 ├── backend/                 # API Node.js + Express
 │   ├── src/
-│   │   ├── controllers/     # Controladores da API
-│   │   ├── models/         # Modelos do MongoDB
-│   │   ├── routes/         # Rotas da API
-│   │   ├── services/       # Serviços (VirtualBox, etc.)
-│   │   ├── middleware/     # Middlewares personalizados
-│   │   ├── utils/          # Utilitários
 │   │   └── config/         # Configurações
 │   ├── scripts/            # Scripts de automação
 │   ├── tests/              # Testes automatizados
@@ -70,56 +53,24 @@ virtualbox-manager/
 ### Frontend
 - **React.js** - Biblioteca UI
 - **Material-UI** - Componentes UI
-- **React Router** - Roteamento
-- **React Query** - Gerenciamento de estado server
-- **Axios** - Cliente HTTP
-- **React Hook Form** - Formulários
-- **React Hot Toast** - Notificações
-- **Framer Motion** - Animações
-
-### DevOps
-- **Docker** - Containerização
 - **ESLint** - Linting de código
 - **Prettier** - Formatação de código
-- **Jest** - Testes automatizados
-
-## 🚀 Instalação e Configuração
-
-### Pré-requisitos
-- Node.js 18+
-- MongoDB
-- VirtualBox instalado
 - Git
 
-### 1. Clone o repositório
-```bash
-git clone <repository-url>
-cd virtualbox-manager
 ```
 
 ### 2. Configure o Backend
-```bash
-cd backend
-npm install
 cp .env.example .env
 # Edite o arquivo .env com suas configurações
 ```
-
-### 3. Configure o Frontend
-```bash
-cd ../frontend
 npm install
-```
-
 ### 4. Inicie os serviços
 
 #### Desenvolvimento
-```bash
 # Terminal 1 - Backend
 cd backend
 npm run dev
 
-# Terminal 2 - Frontend
 cd frontend
 npm start
 
@@ -156,16 +107,11 @@ docker-compose up -d
 #### Scripts
 - `GET /api/scripts` - Listar scripts
 - `POST /api/scripts` - Criar script
-- `POST /api/scripts/:id/execute` - Executar script
-- `GET /api/scripts/:id/history` - Histórico de execução
-
-## 🔧 Configuração
 
 ### Variáveis de Ambiente
 
 ```bash
 # Backend (.env)
-NODE_ENV=development
 PORT=3001
 MONGODB_URI=mongodb://localhost:27017/virtualbox-manager
 FRONTEND_URL=http://localhost:3000

@@ -1,17 +1,17 @@
-import React from 'react';
-import { Typography, Box } from '@mui/material';
+import { useParams } from 'react-router-dom';
 
-const VMDetails = () => {
+function VMDetails() {
+    const { id } = useParams();
+
   return (
-    <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        VM Details
-      </Typography>
-      <Typography>
-        VM details page - to be implemented
-      </Typography>
-    </Box>
+      <div>
+          <h2>Detalhes da VM</h2>
+          <div className="card">
+              <p>ID da VM: {id}</p>
+              <p>Funcionalidade em desenvolvimento...</p>
+          </div>
+      </div>
   );
-};
+}
 
 export default VMDetails;

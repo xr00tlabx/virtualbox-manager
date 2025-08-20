@@ -1,17 +1,13 @@
-import React from 'react';
-import { Typography, Box } from '@mui/material';
 
-const Settings = () => {
+function Settings() {
   return (
-    <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Settings
-      </Typography>
-      <Typography>
-        Settings page - to be implemented
-      </Typography>
-    </Box>
+      <div>
+          <h2>Configurações</h2>
+          <div className="card">
+              <p>Configurações do sistema em desenvolvimento...</p>
+          </div>
+      </div>
   );
-};
+}
 
 export default Settings;

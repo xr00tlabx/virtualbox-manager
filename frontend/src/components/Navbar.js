@@ -1,106 +1,67 @@
-import React from 'react';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  Box,
-  Badge,
-  Avatar,
-  Menu,
-  MenuItem,
-} from '@mui/material';
-import {
-  Menu as MenuIcon,
-  Notifications as NotificationsIcon,
-  AccountCircle,
-} from '@mui/icons-material';
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
-const Navbar = ({ onMenuClick }) => {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+function Navbar() {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const location = useLocation();
 
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
+    const isActive = (path) => {
+        return location.pathname === path ? 'nav-link active' : 'nav-link';
   };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const isMenuOpen = Boolean(anchorEl);
-
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      id="profile-menu"
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
-    </Menu>
-  );
 
   return (
-    <>
-      <AppBar
-        position="fixed"
-        sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          backgroundColor: '#1976d2',
-        }}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={onMenuClick}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            VirtualBox Manager
-          </Typography>
+      <nav className="navbar">
+          <div className="nav-container">
+              <div className="nav-brand">
+                  <Link to="/" className="brand-link">
+                      <span className="brand-icon">⚡</span>
+                      VirtualBox Manager
+                  </Link>
+              </div>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton size="large" color="inherit">
-              <Badge badgeContent={3} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account menu"
-              aria-controls="profile-menu"
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <Avatar sx={{ width: 32, height: 32 }}>
-                <AccountCircle />
-              </Avatar>
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
-      {renderMenu}
-    </>
+              <div className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
+                  <Link to="/" className={isActive('/')}>
+                      <span className="nav-icon">🏠</span>
+                      Dashboard
+                  </Link>
+                  <Link to="/vms" className={isActive('/vms')}>
+                      <span className="nav-icon">💻</span>
+                      Virtual Machines
+                  </Link>
+                  <Link to="/snapshots" className={isActive('/snapshots')}>
+                      <span className="nav-icon">📸</span>
+                      Snapshots
+                  </Link>
+                  <Link to="/scripts" className={isActive('/scripts')}>
+                      <span className="nav-icon">📝</span>
+                      Scripts
+                  </Link>
+                  <Link to="/settings" className={isActive('/settings')}>
+                      <span className="nav-icon">⚙️</span>
+                      Settings
+                  </Link>
+              </div>
+
+              <div className="nav-actions">
+                  <button className="btn btn-primary btn-sm">
+                      <span className="nav-icon">➕</span>
+                      New VM
+                  </button>
+                  <div className="user-menu">
+                      <button className="user-avatar">
+                          <span>👤</span>
+                      </button>
+                  </div>
+              </div>
+
+              <div className="nav-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+              </div>
+          </div>
+      </nav>
   );
-};
+}
 
 export default Navbar;

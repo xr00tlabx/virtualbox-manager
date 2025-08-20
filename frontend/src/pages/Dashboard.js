@@ -1,256 +1,163 @@
-import React from 'react';
-import { useQuery } from 'react-query';
-import {
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  CircularProgress,
-  Chip,
-  IconButton,
-} from '@mui/material';
-import {
-  Computer as ComputerIcon,
-  PlayArrow as PlayIcon,
-  Stop as StopIcon,
-  Pause as PauseIcon,
-  CameraAlt as SnapshotIcon,
-  Code as ScriptIcon,
-  Refresh as RefreshIcon,
-} from '@mui/icons-material';
-import { vmService, snapshotService, scriptService } from '../services';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
-const Dashboard = () => {
-  const { data: vmsData, isLoading: vmsLoading, refetch: refetchVMs } = useQuery(
-    'dashboard-vms',
-    () => vmService.getVMs(),
-    {
-      refetchInterval: 30000, // Refresh every 30 seconds
-    }
-  );
+function Dashboard() {
+    const [vms, setVms] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-  const { data: snapshotsData, isLoading: snapshotsLoading } = useQuery(
-    'dashboard-snapshots',
-    () => snapshotService.getSnapshots({ limit: 5 })
-  );
+    useEffect(() => {
+        // Simulando dados para mostrar a interface
+        setTimeout(() => {
+            setVms([
+                { id: 1, name: 'Windows 10 Dev', state: 'running', ostype: 'Windows', memory: '4096' },
+                { id: 2, name: 'Ubuntu Server', state: 'poweroff', ostype: 'Linux', memory: '2048' },
+                { id: 3, name: 'CentOS Docker', state: 'paused', ostype: 'Linux', memory: '1024' },
+            ]);
+            setLoading(false);
+        }, 1000);
+    }, []);
 
-  const { data: scriptsData, isLoading: scriptsLoading } = useQuery(
-    'dashboard-scripts',
-    () => scriptService.getScripts({ limit: 5 })
-  );
-
-  const vms = vmsData?.data?.vms || [];
-  const snapshots = snapshotsData?.data?.snapshots || [];
-  const scripts = scriptsData?.data?.scripts || [];
-
-  const vmStats = {
-    total: vms.length,
-    running: vms.filter(vm => vm.status === 'running').length,
-    stopped: vms.filter(vm => vm.status === 'stopped').length,
-    paused: vms.filter(vm => vm.status === 'paused').length,
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'running':
-        return 'success';
-      case 'stopped':
-        return 'error';
-      case 'paused':
-        return 'warning';
-      default:
-        return 'default';
+    const fetchVMs = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get('/api/vms');
+            setVms(response.data);
+        } catch (err) {
+            setError('Erro ao carregar VMs - Usando dados de exemplo');
+            console.error('Error fetching VMs:', err);
+            // Fallback para dados de exemplo
+            setVms([
+                { id: 1, name: 'Windows 10 Dev', state: 'running', ostype: 'Windows', memory: '4096' },
+                { id: 2, name: 'Ubuntu Server', state: 'poweroff', ostype: 'Linux', memory: '2048' },
+                { id: 3, name: 'CentOS Docker', state: 'paused', ostype: 'Linux', memory: '1024' },
+            ]);
+        } finally {
+            setLoading(false);
     }
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'running':
-        return <PlayIcon fontSize="small" />;
-      case 'stopped':
-        return <StopIcon fontSize="small" />;
-      case 'paused':
-        return <PauseIcon fontSize="small" />;
-      default:
-        return <ComputerIcon fontSize="small" />;
+    const getStatusColor = (state) => {
+        switch (state) {
+            case 'running': return 'running';
+            case 'paused': return 'paused';
+            default: return 'poweroff';
     }
   };
 
-  if (vmsLoading || snapshotsLoading || scriptsLoading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-        <CircularProgress />
-      </Box>
-    );
-  }
+    if (loading) return <div className="loading">🔄 Carregando dashboard...</div>;
 
   return (
-    <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Dashboard
-        </Typography>
-        <IconButton onClick={refetchVMs} color="primary">
-          <RefreshIcon />
-        </IconButton>
-      </Box>
+      <div>
+          <div className="page-header">
+              <h1>Dashboard</h1>
+              <p>Visão geral das suas máquinas virtuais</p>
+          </div>
 
-      {/* Stats Cards */}
-      <Grid container spacing={3} mb={4}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography color="textSecondary" gutterBottom>
-                    Total VMs
-                  </Typography>
-                  <Typography variant="h5" component="h2">
-                    {vmStats.total}
-                  </Typography>
-                </Box>
-                <ComputerIcon color="primary" sx={{ fontSize: 40 }} />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+          {error && (
+              <div className="error">
+                  ⚠️ {error}
+              </div>
+          )}
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography color="textSecondary" gutterBottom>
-                    Running VMs
-                  </Typography>
-                  <Typography variant="h5" component="h2" color="success.main">
-                    {vmStats.running}
-                  </Typography>
-                </Box>
-                <PlayIcon color="success" sx={{ fontSize: 40 }} />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+          <div className="dashboard-grid">
+              <div className="card stats-card">
+                  <h3>📊 Estatísticas Gerais</h3>
+                  <div className="stats-grid">
+                      <div className="stat-item">
+                          <span className="stat-number">{vms.length}</span>
+                          <span className="stat-label">Total de VMs</span>
+                      </div>
+                      <div className="stat-item success">
+                          <span className="stat-number">{vms.filter(vm => vm.state === 'running').length}</span>
+                          <span className="stat-label">Ativas</span>
+                      </div>
+                      <div className="stat-item warning">
+                          <span className="stat-number">{vms.filter(vm => vm.state === 'paused').length}</span>
+                          <span className="stat-label">Pausadas</span>
+                      </div>
+                      <div className="stat-item danger">
+                          <span className="stat-number">{vms.filter(vm => vm.state === 'poweroff').length}</span>
+                          <span className="stat-label">Paradas</span>
+                      </div>
+                  </div>
+              </div>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography color="textSecondary" gutterBottom>
-                    Snapshots
-                  </Typography>
-                  <Typography variant="h5" component="h2">
-                    {snapshots.length}
-                  </Typography>
-                </Box>
-                <SnapshotIcon color="info" sx={{ fontSize: 40 }} />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+              <div className="card quick-actions-card">
+                  <h3>⚡ Ações Rápidas</h3>
+                  <div className="quick-actions">
+                      <button className="btn btn-primary">
+                          <span>➕</span>
+                          Nova VM
+                      </button>
+                      <button className="btn btn-secondary">
+                          <span>📥</span>
+                          Importar
+                      </button>
+                      <button className="btn btn-secondary">
+                          <span>💾</span>
+                          Backup
+                      </button>
+                      <button className="btn btn-secondary" onClick={fetchVMs}>
+                          <span>🔄</span>
+                          Atualizar
+                      </button>
+                  </div>
+              </div>
+          </div>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography color="textSecondary" gutterBottom>
-                    Scripts
-                  </Typography>
-                  <Typography variant="h5" component="h2">
-                    {scripts.length}
-                  </Typography>
-                </Box>
-                <ScriptIcon color="secondary" sx={{ fontSize: 40 }} />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+          <div className="card">
+              <div className="card-header">
+                  <h3>💻 Máquinas Virtuais</h3>
+                  <button className="btn btn-sm btn-secondary" onClick={fetchVMs}>
+                      🔄 Atualizar
+                  </button>
+              </div>
 
-      {/* Recent Activity */}
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Virtual Machines
-              </Typography>
               {vms.length === 0 ? (
-                <Typography color="textSecondary">
-                  No virtual machines found
-                </Typography>
+                  <div className="empty-state">
+                      <div className="empty-icon">📱</div>
+                      <h4>Nenhuma VM encontrada</h4>
+                      <p>Comece criando sua primeira máquina virtual</p>
+                      <button className="btn btn-primary">
+                          ➕ Criar Nova VM
+                      </button>
+                  </div>
               ) : (
-                <Box>
-                  {vms.slice(0, 5).map((vm) => (
-                    <Box
-                      key={vm._id}
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      py={1}
-                      borderBottom="1px solid #eee"
-                    >
-                      <Box display="flex" alignItems="center" gap={1}>
-                        {getStatusIcon(vm.status)}
-                        <Typography variant="body1">{vm.name}</Typography>
-                      </Box>
-                      <Chip
-                        label={vm.status}
-                        color={getStatusColor(vm.status)}
-                        size="small"
-                      />
-                    </Box>
-                  ))}
-                </Box>
+                  <div className="vm-list">
+                      {vms.map((vm) => (
+                          <div key={vm.id} className="vm-item">
+                              <div className="vm-info">
+                                  <div className="vm-header">
+                                      <h4 className="vm-name">💻 {vm.name}</h4>
+                                      <span className={`vm-status ${getStatusColor(vm.state)}`}>
+                                          {vm.state === 'running' ? '🟢' : vm.state === 'paused' ? '🟡' : '🔴'}
+                                          {vm.state}
+                                      </span>
+                                  </div>
+                                  <div className="vm-details">
+                                      <span className="vm-detail">🖥️ {vm.ostype || 'N/A'}</span>
+                                      <span className="vm-detail">💾 {vm.memory || 'N/A'} MB</span>
+                                  </div>
+                              </div>
+                              <div className="vm-actions">
+                                  {vm.state === 'running' ? (
+                                      <>
+                                          <button className="btn btn-sm btn-secondary">⏸️ Pausar</button>
+                                          <button className="btn btn-sm btn-danger">⏹️ Parar</button>
+                                      </>
+                                  ) : (
+                            <button className="btn btn-sm btn-primary">▶️ Iniciar</button>
+                        )}
+                        <button className="btn btn-sm btn-secondary">⚙️ Detalhes</button>
+                    </div>
+                </div>
+            ))}
+                  </div>
               )}
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Recent Snapshots
-              </Typography>
-              {snapshots.length === 0 ? (
-                <Typography color="textSecondary">
-                  No snapshots found
-                </Typography>
-              ) : (
-                <Box>
-                  {snapshots.map((snapshot) => (
-                    <Box
-                      key={snapshot._id}
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      py={1}
-                      borderBottom="1px solid #eee"
-                    >
-                      <Box>
-                        <Typography variant="body1">{snapshot.name}</Typography>
-                        <Typography variant="body2" color="textSecondary">
-                          {snapshot.vmId?.name}
-                        </Typography>
-                      </Box>
-                      <Typography variant="caption" color="textSecondary">
-                        {new Date(snapshot.createdAt).toLocaleDateString()}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    </Box>
+          </div>
+      </div>
   );
-};
+}
 
 export default Dashboard;

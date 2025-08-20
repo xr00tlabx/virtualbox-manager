@@ -6,14 +6,15 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm install
 
 # Install serve to serve static files
 RUN npm install -g serve
 
-# Copy source code
+# Copy source code and index.html
 COPY src/ ./src/
-COPY public/ ./public/
+COPY index.html ./
+COPY vite.config.js ./
 
 # Build the app
 RUN npm run build
@@ -22,4 +23,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Serve the built app
-CMD ["serve", "-s", "build", "-l", "3000"]
+CMD ["serve", "-s", "dist", "-l", "3000"]

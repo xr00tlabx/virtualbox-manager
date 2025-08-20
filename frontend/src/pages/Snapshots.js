@@ -1,17 +1,13 @@
-import React from 'react';
-import { Typography, Box } from '@mui/material';
 
-const Snapshots = () => {
+function Snapshots() {
   return (
-    <Box>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Snapshots
-      </Typography>
-      <Typography>
-        Snapshots management page - to be implemented
-      </Typography>
-    </Box>
+      <div>
+          <h2>Snapshots</h2>
+          <div className="card">
+              <p>Gerenciamento de snapshots em desenvolvimento...</p>
+          </div>
+      </div>
   );
-};
+}
 
 export default Snapshots;
